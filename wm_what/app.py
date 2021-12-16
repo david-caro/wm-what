@@ -102,12 +102,17 @@ def search():
         example_terms = lib.get_terms(limit=25)
     else:
         example_terms = None
+
+    if len(terms) == 1:
+        return flask.redirect(flask.url_for("get_term", term_name=term_name))
+
     return render_template(
         "search_results.html",
         terms=terms,
         search_value=term_name or "",
         example_terms=example_terms,
         user=current_user.get_id(),
+        exact_match=any(term["name"] == term_name for term in terms),
     )
 
 
@@ -243,6 +248,28 @@ def update_definition(definition_id: int):
 
     except lib.Unauthorized as error:
         return (f"{error}", 401)
+
+    return flask.redirect(flask.url_for("get_term", term_name=term_name))
+
+
+@app.route("/term", methods=["POST"])
+@login_required
+def create_term():
+    term_name = flask.request.form.get("term_name")
+    content = flask.request.form.get("content")
+    if not term_name:
+        return ("Bad request, missing term_name in post payload", 403)
+    if not content:
+        return ("Bad request, missing content in post payload", 403)
+    try:
+        lib.add_term(term_name=term_name)
+        lib.add_definition_to_term(
+            term_name=term_name,
+            content=content,
+            author=current_user.username,
+        )
+    except lib.NotFound as error:
+        return (f"{error}", 404)
 
     return flask.redirect(flask.url_for("get_term", term_name=term_name))
 

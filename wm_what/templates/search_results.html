@@ -1,51 +1,56 @@
-{% extends 'layout.html' %}
-{% block title %}Search results{% endblock %}
-{% block content %}
-  <form action="/search">
-    <label for="fname">Term to search for:</label><br />
-    <input
-      type="text"
-      name="term_name"
-      value="{{search_value}}"
-    /><br />
-    <input type="submit" value="Submit" />
-  </form>
+{% extends 'layout.html' %} {% block title %}Search results{% endblock %} {%
+block content %}
+<form action="/search">
+  <label for="fname">Term to search for:</label><br />
+  <input type="text" name="term_name" value="{{search_value}}" /><br />
+  <input type="submit" value="Submit" />
+</form>
 
-  {% if search_value != "" %} {% if terms %}
-  <p>Matches:</p>
-  <table id="matches">
-    <tr>
-      <th>Term</th>
-    </tr>
-    {% for term in terms %}
-    <tr>
-      <td>
-        <a href="{{url_for('get_term', term_name=term.name)}}"
-          >{{ term.name }}</a
-        >
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-  <p>
-    {% else %} No results for {{ search_value }}. {% endif %} {% endif %} {% if
-    example_terms %}
-  </p>
-  <p>Some existing terms are:</p>
-  <table id="existing_terms">
-    <tr>
-      <th>Term</th>
-    </tr>
-    {% for example_term in example_terms %}
-    <tr>
-      <td>
-        <a href="{{url_for('get_term', term_name=example_term.name)}}"
-          >{{ example_term.name }}</a
-        >
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% endif %}
-
-{% endblock %}
+{% if search_value != "" %} {% if terms %}
+<p>Matches:</p>
+<table id="matches">
+  <tr>
+    <th>Term</th>
+  </tr>
+  {% for term in terms %}
+  <tr>
+    <td>
+      <a href="{{url_for('get_term', term_name=term.name)}}">{{ term.name }}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p id="no_matches">No results for {{ search_value }}.</p>
+{% endif %} {% endif %} {% if not exact_match %} {% if terms %}
+<p>Not the term you were expecting? Add a new one!</p>
+{% endif %} {% if user %}
+<form action="{{url_for('create_term')}}" method="post">
+  <label for="fname">Add a new definition for {{search_value}}:</label><br />
+  <input
+    type="hidden"
+    id="term_name"
+    name="term_name"
+    value="{{search_value}}"
+  /><br />
+  <input type="text" id="content" name="content" value="New definition" /><br />
+  <input type="submit" value="Submit" />
+</form>
+{% else %} You'll have to <a href="{{url_for('login')}}">login</a> first {%
+endif %} {% endif %} {% if example_terms %}
+<p>Some existing terms are:</p>
+<table id="existing_terms">
+  <tr>
+    <th>Term</th>
+  </tr>
+  {% for example_term in example_terms %}
+  <tr>
+    <td>
+      <a href="{{url_for('get_term', term_name=example_term.name)}}"
+        >{{ example_term.name }}</a
+      >
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %} {% endblock %}
