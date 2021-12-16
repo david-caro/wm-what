@@ -1,0 +1,7 @@
+[tool.isort]
+profile="black"
+
+
+[tool.mypy]
+files = "./wm_what/**/*.py"
+follow_imports = false

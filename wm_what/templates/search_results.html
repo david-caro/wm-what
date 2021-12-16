@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block title %}Search results{% endblock %}
+{% block content %}
+  <form action="/search">
+    <label for="fname">Term to search for:</label><br />
+    <input
+      type="text"
+      name="term_name"
+      value="{{search_value}}"
+    /><br />
+    <input type="submit" value="Submit" />
+  </form>
+
+  {% if search_value != "" %} {% if terms %}
+  <p>Matches:</p>
+  <table id="matches">
+    <tr>
+      <th>Term</th>
+    </tr>
+    {% for term in terms %}
+    <tr>
+      <td>
+        <a href="{{url_for('get_term', term_name=term.name)}}"
+          >{{ term.name }}</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p>
+    {% else %} No results for {{ search_value }}. {% endif %} {% endif %} {% if
+    example_terms %}
+  </p>
+  <p>Some existing terms are:</p>
+  <table id="existing_terms">
+    <tr>
+      <th>Term</th>
+    </tr>
+    {% for example_term in example_terms %}
+    <tr>
+      <td>
+        <a href="{{url_for('get_term', term_name=example_term.name)}}"
+          >{{ example_term.name }}</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+{% endblock %}

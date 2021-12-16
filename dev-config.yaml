@@ -1,0 +1,7 @@
+SQLALCHEMY_ECHO: true
+SQLALCHEMY_TRACK_MODIFICATIONS: False
+WIKIMEDIA_OAUTH2_TOKEN: "a0652706e2e016875fe831599e0c15ed"
+WIKIMEDIA_OAUTH2_SECRET: "39af9ba6cb799edae740774be000065f666a07dc"
+WIKIMEDIA_OAUTH2_URL: https://meta.wikimedia.org/w/rest.php
+# Set to false if you don't want to do the oauth dance
+FORCE_OAUTH_LOGIN: true

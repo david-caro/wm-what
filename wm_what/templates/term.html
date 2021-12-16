@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+{% block title %}{{term.name}}{% endblock %}
+{% block content %}
+  <h2 id="term_name">{{term.name}}</h2>
+  <table id="definitions">
+    <tr>
+      <th>Definitions:</th>
+    </tr>
+    {% for definition in term.definitions %}
+    <tr>
+      <td>
+        {% if definition.author == user %}
+        <form id="update_form" action="{{url_for('update_definition', definition_id=definition.id)}}" method="post">
+          <input
+            type="hidden"
+            id="term_name"
+            name="term_name"
+            value="{{term.name}}"
+          /><br />
+          <div id="update_form_input">
+          <input
+            type="text"
+            id="content"
+            name="content"
+            value="{{definition.content}}"
+          /><br />
+          -- by {{definition.author}} (you)
+          </div>
+          <input type="submit" value="Update" />
+        </form>
+        {% else %}
+        {{definition.content}} -- by {{definition.author}}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  {% if not has_definition and user %}
+  <form action="{{url_for('create_definition')}}" method="post">
+    <label for="fname">Add a new definition:</label><br />
+    <input
+      type="hidden"
+      id="term_name"
+      name="term_name"
+      value="{{term.name}}"
+    /><br />
+    <input
+      type="text"
+      id="content"
+      name="content"
+      value="New definition"
+    /><br />
+    <input type="submit" value="Submit" />
+  </form>
+  {% endif %}
+  <p><a href="{{url_for('splash')}}">Back to search</a></p>
+
+{% endblock %}

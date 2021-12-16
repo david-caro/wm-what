@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.sw?
+.eggs
+*.egg-info
+__pycache__
+*.pyc
+*.pyo
+CHANGELOG
+AUTHORS
+
+dev.db

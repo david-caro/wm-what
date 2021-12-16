@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block title %}Splash{% endblock %}
+{% block content %}
+  <h1>Welcome to Wikimedia What!</h1>
+
+  This is a Wikimedia specific lingo definition tool.
+  <br />
+  <br />
+
+  <form action="/search">
+    <label for="fname">Term to search for:</label><br />
+    <input type="text" name="term_name" value="" /><br />
+    <input type="submit" value="Submit" />
+  </form>
+
+  <p>Some examples are:</p>
+  <table>
+    <tr>
+      <th>Term</th>
+    </tr>
+    {% for example_term in example_terms %}
+    <tr>
+      <td>
+        <a href="{{url_for('get_term', term_name=example_term.name)}}"
+          >{{ example_term.name }}</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endblock %}
