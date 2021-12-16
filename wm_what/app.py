@@ -67,18 +67,16 @@ swagger = Swagger(app, template=template)
 
 
 if app.config["ENV"] == "production":
-    STATIC_FILES_HOST = ""
-    APP_BASE_PATH = ""
-    app.config.update(yaml.safe_load((REPO_FOLDER / "prod-config.yaml").open()))
-
+    config_file = "prod-config.yaml"
 
 elif app.config["ENV"] == "development":
-    STATIC_FILES_HOST = "http://localhost:5000"
-    APP_BASE_PATH = ""
+    config_file = "dev-config.yaml"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////" + str(REPO_FOLDER / "dev.db")
-    app.config.update(yaml.safe_load((REPO_FOLDER / "dev-config.yaml").open()))
-    app.secret_key = "".join(random.choice(string.ascii_letters) for _ in range(32))
+    app.config["SECRET_KEY"] = "".join(random.choice(string.ascii_letters) for _ in range(32))
 
+
+app.config.update(yaml.safe_load((REPO_FOLDER / config_file).open()))
+app.secret_key = app.config["SECRET_KEY"]
 db.init_app(app)
 ma.init_app(app)
 

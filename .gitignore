@@ -137,3 +137,7 @@ CHANGELOG
 AUTHORS
 
 dev.db
+prod-config.yaml
+app.py
+static/
+templates/

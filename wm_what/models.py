@@ -14,13 +14,13 @@ class Definition(db.Model):
     content = db.Column(db.String(256), unique=False, nullable=False)
     created = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.now())
     updated = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.now(), onupdate=db.func.now())
-    term_name = db.Column(db.String(256), db.ForeignKey("term.name"))
+    term_name = db.Column(db.String(80), db.ForeignKey("term.name"))
     term = db.relationship("Term", back_populates="definitions")
 
 
 class Term(db.Model):
     __tablename__ = "term"
-    name = db.Column(db.String(256), primary_key=True)
+    name = db.Column(db.String(80), primary_key=True)
     definitions = db.relationship("Definition", back_populates="term")
 
 

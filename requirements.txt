@@ -1,3 +1,14 @@
+apispec
+apispec-webframeworks
 autosemver
+flasgger
 flask
+flask-login
+flask-marshmallow
+flask-restful
+flask-sqlalchemy
+marshmallow-sqlalchemy
+requests
+social-auth-app-flask
+social-auth-app-flask-sqlalchemy
 werkzeug
