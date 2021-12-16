@@ -23,7 +23,6 @@ from flask_login.utils import login_required, login_user
 from wm_what import lib
 from wm_what.api import apiv1
 from wm_what.models import DefinitionSchema, TermSchema, User, db, ma
-from wm_what.utils import logged_in
 
 dictConfig(
     {

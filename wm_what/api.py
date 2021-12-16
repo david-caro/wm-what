@@ -1,8 +1,7 @@
-from flask import Blueprint, redirect, request, session, url_for
+from flask import Blueprint, request
+from flask_login.utils import login_required
 
 from wm_what import lib
-from wm_what.models import Definition, DefinitionSchema, Term, TermSchema, db
-from wm_what.utils import logged_in
 
 apiv1 = Blueprint(name="apiv1", import_name=__name__)
 
@@ -80,7 +79,8 @@ def get_definition(id: str):
 
 
 @apiv1.route("/definition/<id>", methods=["POST"])
-def set_definition(id: str):
+@login_required
+def update_definition(id: str):
     """Update an existing definition.
     ---
     post:
@@ -122,7 +122,7 @@ def set_definition(id: str):
 
 
 @apiv1.route("/definition", methods=["POST"])
-@logged_in
+@login_required
 def api_create_definition(user: str):
     """Create a new definition.
     ---
@@ -165,7 +165,7 @@ def api_create_definition(user: str):
 
 
 @apiv1.route("/definition/<id>", methods=["DELETE"])
-@logged_in
+@login_required
 def delete_definition(id: str, user: str):
     """Delete a definition.
     ---
