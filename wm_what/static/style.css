@@ -154,3 +154,7 @@ table th {
   display: flex;
   flex-direction: row;
 }
+
+#update_form_input input[type = "text"] {
+  width: 100%;
+}
