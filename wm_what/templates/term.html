@@ -9,6 +9,7 @@
     {% for definition in term.definitions %}
     <tr>
       <td>
+        {{definition.content}} -- by {{definition.author}}
         {% if definition.author == user %}
         <form id="update_form" action="{{url_for('update_definition', definition_id=definition.id)}}" method="post">
           <input
@@ -29,8 +30,6 @@
           </div>
           <input type="submit" value="Update" />
         </form>
-        {% else %}
-        {{definition.content}} -- by {{definition.author}}
         {% endif %}
       </td>
     </tr>
