@@ -4,4 +4,4 @@ profile="black"
 
 [tool.mypy]
 files = "./wm_what/**/*.py"
-follow_imports = false
+ignore_missing_imports = true
