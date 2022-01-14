@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from wm_what.app import app, db
 from wm_what.models import Definition, Term
 
