@@ -45,7 +45,7 @@ def get_definition(id: int) -> Dict[str, Any]:
     return definition_schema.dump(definition)
 
 
-def set_definition(id: int, term_name: str, author: str, content: str) -> None:
+def set_definition(id: int, term_name: str, author: str, content: str) -> Dict[str, Any]:
     definition = db.session.query(Definition).filter_by(id=id).one_or_none()
     if not definition:
         raise NotFound(f"Unable to find a definition with id {id}.")
@@ -61,6 +61,15 @@ def set_definition(id: int, term_name: str, author: str, content: str) -> None:
     definition = db.session.query(Definition).filter_by(id=id).one()
     definition_schema = DefinitionSchema()
     return definition_schema.dump(definition)
+
+
+def delete_definition(id: int) -> None:
+    definition = db.session.query(Definition).filter_by(id=id).one_or_none()
+    if not definition:
+        raise NotFound(f"Unable to find a definition with id {id}.")
+
+    db.session.delete(definition)
+    db.session.commit()
 
 
 def add_term(term_name: str) -> Optional[Dict[str, Any]]:

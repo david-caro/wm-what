@@ -19,6 +19,7 @@ from flasgger import APISpec, Swagger  # type: ignore
 from flask import Flask, render_template  # type: ignore
 from flask_login import LoginManager, current_user, login_manager
 from flask_login.utils import login_required, login_user
+from flaskext.markdown import Markdown
 
 from wm_what import lib
 from wm_what.api import apiv1
@@ -48,6 +49,7 @@ THIS_FILE_FOLDER = Path(__file__).resolve().absolute().parent
 REPO_FOLDER = THIS_FILE_FOLDER.parent
 
 app = Flask(__name__)
+Markdown(app, safe_mode=True)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.register_blueprint(apiv1, url_prefix="/api/v1")
@@ -120,7 +122,12 @@ def get_term(term_name):
         return (f"Term with name '{term_name}' not found.", 404)
 
     has_definition = any(definition["author"] == flask.session.get("username") for definition in term["definitions"])
-    return render_template("term.html", term=term, has_definition=has_definition, user=current_user.get_id())
+    return render_template(
+        "term.html",
+        term=term,
+        has_definition=has_definition,
+        user=current_user.get_id(),
+    )
 
 
 @app.route("/login")

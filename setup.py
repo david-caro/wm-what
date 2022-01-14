@@ -22,6 +22,7 @@ if __name__ == "__main__":
             "flask-marshmallow",
             "flask-restful",
             "flask-sqlalchemy",
+            "flask-markdown",
             "marshmallow-sqlalchemy",
             "requests",
             "social-auth-app-flask",

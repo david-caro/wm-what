@@ -55,13 +55,13 @@ def get_term(term_name: str):
 
 
 @apiv1.route("/definition/<id>")
-def get_definition(id: str):
+def get_definition(id: int):
     """Retrieve a given definition.
     ---
     parameters:
       - name: id
         in: path
-        type: string
+        type: number
         required: true
     responses:
         200:
@@ -80,14 +80,14 @@ def get_definition(id: str):
 
 @apiv1.route("/definition/<id>", methods=["POST"])
 @login_required
-def update_definition(id: str):
+def update_definition(id: int):
     """Update an existing definition.
     ---
     post:
         parameters:
         - name: id
           in: path
-          type: string
+          type: number
           required: true
         - name: term_name
           in: query
@@ -111,8 +111,8 @@ def update_definition(id: str):
     try:
         definition = lib.set_definition(
             id=id,
-            content=request.args.get("content"),
-            term_name=request.args.get("term_name"),
+            content=request.args["content"],
+            term_name=request.args["term_name"],
             author="nobody",
         )
     except lib.NotFound as error:
@@ -166,14 +166,14 @@ def api_create_definition(user: str):
 
 @apiv1.route("/definition/<id>", methods=["DELETE"])
 @login_required
-def delete_definition(id: str, user: str):
+def delete_definition(id: int, user: str):
     """Delete a definition.
     ---
     post:
         parameters:
         - name: id
           in: query
-          type: string
+          type: number
           required: true
     responses:
         200:
@@ -193,7 +193,7 @@ def delete_definition(id: str, user: str):
     except lib.NotFound as error:
         return (f"{error}", 404)
 
-    if definition.author != user:
+    if definition["author"] != user:
         return (f"Unauthorized, you are not the user that created this definition.", 401)
 
     lib.delete_definition(id=id)
