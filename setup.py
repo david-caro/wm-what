@@ -36,6 +36,7 @@ if __name__ == "__main__":
                 "isort",
                 "types-pyyaml",
                 "types-flask",
+                "types-requests",
             ]
         },
         license="GPLv3",

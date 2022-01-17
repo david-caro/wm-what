@@ -143,3 +143,5 @@ prod-config.yaml
 /templates
 
 /lolo
+
+/.vscode/
