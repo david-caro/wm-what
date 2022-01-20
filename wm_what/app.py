@@ -17,6 +17,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 from flasgger import APISpec, Swagger  # type: ignore
 from flask import Flask, render_template  # type: ignore
+from flask_migrate import Migrate
 from flask_login import LoginManager, current_user, login_manager
 from flask_login.utils import login_required, login_user
 from flaskext.markdown import Markdown
@@ -49,9 +50,14 @@ THIS_FILE_FOLDER = Path(__file__).resolve().absolute().parent
 REPO_FOLDER = THIS_FILE_FOLDER.parent
 
 app = Flask(__name__)
+
+migrate = Migrate(app, db)
+
 Markdown(app, safe_mode=True)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 app.register_blueprint(apiv1, url_prefix="/api/v1")
 
 spec = APISpec(
@@ -73,7 +79,9 @@ if app.config["ENV"] == "production":
 elif app.config["ENV"] == "development":
     config_file = "dev-config.yaml"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////" + str(REPO_FOLDER / "dev.db")
-    app.config["SECRET_KEY"] = "".join(random.choice(string.ascii_letters) for _ in range(32))
+    app.config["SECRET_KEY"] = "".join(
+        random.choice(string.ascii_letters) for _ in range(32)
+    )
 
 
 app.config.update(yaml.safe_load((REPO_FOLDER / config_file).open()))
@@ -90,7 +98,9 @@ def load_user(user_id):
 @app.route("/")
 def splash():
     example_terms = lib.get_terms(limit=25)
-    return render_template("splash.html", example_terms=example_terms, user=current_user.get_id())
+    return render_template(
+        "splash.html", example_terms=example_terms, user=current_user.get_id()
+    )
 
 
 @app.route("/search")
@@ -121,7 +131,10 @@ def get_term(term_name):
     if not term:
         return (f"Term with name '{term_name}' not found.", 404)
 
-    has_definition = any(definition["author"] == flask.session.get("username") for definition in term["definitions"])
+    has_definition = any(
+        definition["author"] == flask.session.get("username")
+        for definition in term["definitions"]
+    )
     return render_template(
         "term.html",
         term=term,
@@ -152,7 +165,9 @@ def login():
     }
     flask.session["oauth2_state"] = state
 
-    params_str = "&".join(f"{name}={quote_plus(value)}" for name, value in params.items())
+    params_str = "&".join(
+        f"{name}={quote_plus(value)}" for name, value in params.items()
+    )
     final_url = authorization_url + "?" + params_str
     print(final_url)
 
@@ -190,7 +205,9 @@ def oauth_callback():
 
     try:
         token_response = requests.post(
-            url=access_token_url, data=params_str, headers={"Content-type": "application/x-www-form-urlencoded"}
+            url=access_token_url,
+            data=params_str,
+            headers={"Content-type": "application/x-www-form-urlencoded"},
         )
         token_response.raise_for_status()
     except Exception as error:
@@ -203,7 +220,8 @@ def oauth_callback():
     identity_url = base_url + "/oauth2/resource/profile"
     try:
         identity_response = requests.get(
-            url=identity_url, headers={"Authorization": f"Bearer {flask.session['access_token']}"}
+            url=identity_url,
+            headers={"Authorization": f"Bearer {flask.session['access_token']}"},
         )
         identity_response.raise_for_status()
     except Exception as error:
@@ -312,7 +330,10 @@ def delete_definition():
         return (f"{error}", 404)
 
     if definition.author != current_user.username:
-        return (f"Unauthorized, you are not the user that created this definition.", 401)
+        return (
+            f"Unauthorized, you are not the user that created this definition.",
+            401,
+        )
 
     lib.delete_definition(id=def_id)
     return ("Definition deleted", 200)
@@ -321,7 +342,9 @@ def delete_definition():
 @app.route("/favicon.ico")
 def favicon():
     return flask.send_from_directory(
-        os.path.join(app.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon"
+        os.path.join(app.root_path, "static"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
     )
 
 
