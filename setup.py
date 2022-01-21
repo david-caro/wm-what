@@ -34,11 +34,12 @@ if __name__ == "__main__":
         ],
         extras_require={
             "test": [
-                "mypy",
                 "black",
+                "flake8",
                 "isort",
-                "types-pyyaml",
+                "mypy",
                 "types-flask",
+                "types-pyyaml",
                 "types-requests",
             ]
         },

@@ -5,9 +5,11 @@ Revises:
 Create Date: 2022-01-20 10:25:23.564605
 
 """
-from alembic import op
 from typing import Optional
+
 import sqlalchemy as sa
+from alembic import op
+
 from wm_what.app import app, db
 from wm_what.models import Definition, Term
 

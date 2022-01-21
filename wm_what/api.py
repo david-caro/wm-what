@@ -48,7 +48,7 @@ def get_term(term_name: str):
     """
     try:
         term = lib.get_term(name=term_name)
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return term
@@ -72,7 +72,7 @@ def get_definition(id: int):
     """
     try:
         definition = lib.get_definition(id=id)
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return definition
@@ -115,7 +115,7 @@ def update_definition(id: int):
             term_name=request.args["term_name"],
             author="nobody",
         )
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return definition
@@ -158,7 +158,7 @@ def api_create_definition(user: str):
             content=content,
             author=user,
         )
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return definition
@@ -190,11 +190,11 @@ def delete_definition(id: int, user: str):
 
     try:
         definition = lib.get_definition(id=id)
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     if definition["author"] != user:
-        return (f"Unauthorized, you are not the user that created this definition.", 401)
+        return ("Unauthorized, you are not the user that created this definition.", 401)
 
     lib.delete_definition(id=id)
     return ("Definition deleted", 200)
