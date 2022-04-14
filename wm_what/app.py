@@ -47,6 +47,9 @@ dictConfig(
 
 THIS_FILE_FOLDER = Path(__file__).resolve().absolute().parent
 REPO_FOLDER = THIS_FILE_FOLDER.parent
+# this is needed when running on toolforge from the top level app.py link
+if REPO_FOLDER.name != "wm_what":
+    REPO_FOLDER = REPO_FOLDER / "wm_what"
 
 app = Flask(__name__)
 Markdown(app, safe_mode=True)
