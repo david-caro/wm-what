@@ -7,6 +7,7 @@ flask-login
 flask-marshmallow
 flask-restful
 flask-sqlalchemy
+Flask-Markdown
 marshmallow-sqlalchemy
 requests
 social-auth-app-flask
