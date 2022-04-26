@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 from typing import Any, Dict, Optional
 
-from requests.models import HTTPError
-
 from wm_what.models import Definition, DefinitionSchema, Term, TermSchema, db
 
 
-class NotFound(Exception):
+class NotFoundError(Exception):
     pass
 
 
-class Unauthorized(Exception):
+class UnauthorizedError(Exception):
     pass
 
 
@@ -30,7 +28,7 @@ def get_terms(name_filter: Optional[str] = None, limit: Optional[int] = None) ->
 def get_term(name: str) -> Dict[str, Any]:
     term = db.session.query(Term).filter_by(name=name).one_or_none()
     if not term:
-        raise NotFound(f"Unable to find a term with name {name}.")
+        raise NotFoundError(f"Unable to find a term with name {name}.")
 
     term_schema = TermSchema(many=False)
     return term_schema.dump(term)
@@ -39,7 +37,7 @@ def get_term(name: str) -> Dict[str, Any]:
 def get_definition(id: int) -> Dict[str, Any]:
     definition = db.session.query(Definition).filter_by(id=id).one_or_none()
     if not definition:
-        raise NotFound(f"Unable to find a definition with id {id}.")
+        raise NotFoundError(f"Unable to find a definition with id {id}.")
 
     definition_schema = DefinitionSchema()
     return definition_schema.dump(definition)
@@ -48,10 +46,10 @@ def get_definition(id: int) -> Dict[str, Any]:
 def set_definition(id: int, term_name: str, author: str, content: str) -> Dict[str, Any]:
     definition = db.session.query(Definition).filter_by(id=id).one_or_none()
     if not definition:
-        raise NotFound(f"Unable to find a definition with id {id}.")
+        raise NotFoundError(f"Unable to find a definition with id {id}.")
 
     if not db.session.query(Term).filter_by(name=term_name).one_or_none():
-        raise NotFound(f"Unable to find a term with name {term_name}.")
+        raise NotFoundError(f"Unable to find a term with name {term_name}.")
 
     definition.author = author
     definition.content = content
@@ -66,7 +64,7 @@ def set_definition(id: int, term_name: str, author: str, content: str) -> Dict[s
 def delete_definition(id: int) -> None:
     definition = db.session.query(Definition).filter_by(id=id).one_or_none()
     if not definition:
-        raise NotFound(f"Unable to find a definition with id {id}.")
+        raise NotFoundError(f"Unable to find a definition with id {id}.")
 
     db.session.delete(definition)
     db.session.commit()
@@ -82,17 +80,17 @@ def update_definition_for_term(
     term_name: str, definition_id: int, author: str, content: str
 ) -> Optional[Dict[str, Any]]:
     if not db.session.query(Term).filter_by(name=term_name).one_or_none():
-        raise NotFound(f"Unable to find a term with name {term_name}.")
+        raise NotFoundError(f"Unable to find a term with name {term_name}.")
 
     current_definition = db.session.query(Definition).filter_by(id=definition_id).one_or_none()
     if not current_definition:
-        raise NotFound(f"Unable to find a a definiton with id {definition_id}.")
+        raise NotFoundError(f"Unable to find a a definiton with id {definition_id}.")
 
     if current_definition.author != author:
-        raise Unauthorized(f"Author {author} is not the author of the definition {definition_id}.")
+        raise UnauthorizedError(f"Author {author} is not the author of the definition {definition_id}.")
 
     if current_definition.term_name != term_name:
-        raise Unauthorized(
+        raise UnauthorizedError(
             f"Term {term_name} is not the term of the definition {definition_id} ({current_definition.term_name})."
         )
 
@@ -105,7 +103,7 @@ def update_definition_for_term(
 
 def add_definition_to_term(term_name: str, author: str, content: str) -> Optional[Dict[str, Any]]:
     if not db.session.query(Term).filter_by(name=term_name).one_or_none():
-        raise NotFound(f"Unable to find a term with name {term_name}.")
+        raise NotFoundError(f"Unable to find a term with name {term_name}.")
 
     new_definition = Definition(term_name=term_name, author=author, content=content)
     db.session.add(new_definition)

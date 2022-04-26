@@ -1,0 +1,13 @@
+name: Run tox
+on: [push]
+jobs:
+  Run-tox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install latest pip
+        run: pip install --upgrade pip setuptools
+      - name: Install tox
+        run: pip install tox
+      - run: tox

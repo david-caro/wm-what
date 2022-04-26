@@ -19,6 +19,7 @@ from flasgger import APISpec, Swagger  # type: ignore
 from flask import Flask, render_template  # type: ignore
 from flask_login import LoginManager, current_user, login_manager
 from flask_login.utils import login_required, login_user
+from flask_migrate import Migrate
 from flaskext.markdown import Markdown
 
 from wm_what import lib
@@ -52,9 +53,14 @@ if REPO_FOLDER.name != "wm_what":
     REPO_FOLDER = REPO_FOLDER / "wm_what"
 
 app = Flask(__name__)
+
+migrate = Migrate(app, db)
+
 Markdown(app, safe_mode=True)
-login_manager = LoginManager()
-login_manager.init_app(app)
+
+app_login_manager = LoginManager()
+app_login_manager.init_app(app)
+
 app.register_blueprint(apiv1, url_prefix="/api/v1")
 
 spec = APISpec(
@@ -76,7 +82,7 @@ if app.config["ENV"] == "production":
 elif app.config["ENV"] == "development":
     config_file = "dev-config.yaml"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////" + str(REPO_FOLDER / "dev.db")
-    app.config["SECRET_KEY"] = "".join(random.choice(string.ascii_letters) for _ in range(32))
+    app.config["SECRET_KEY"] = "".join(random.choice(string.ascii_letters) for _ in range(32))  # nosec
 
 
 app.config.update(yaml.safe_load((REPO_FOLDER / config_file).open()))
@@ -145,7 +151,7 @@ def login():
 
     base_url = app.config["WIKIMEDIA_OAUTH2_URL"]
     authorization_url = base_url + "/oauth2/authorize"
-    state = "".join(random.choice(string.ascii_letters) for _ in range(16))
+    state = "".join(random.choice(string.ascii_letters) for _ in range(16))  # nosec
 
     params = {
         "response_type": "code",
@@ -193,7 +199,9 @@ def oauth_callback():
 
     try:
         token_response = requests.post(
-            url=access_token_url, data=params_str, headers={"Content-type": "application/x-www-form-urlencoded"}
+            url=access_token_url,
+            data=params_str,
+            headers={"Content-type": "application/x-www-form-urlencoded"},
         )
         token_response.raise_for_status()
     except Exception as error:
@@ -206,7 +214,8 @@ def oauth_callback():
     identity_url = base_url + "/oauth2/resource/profile"
     try:
         identity_response = requests.get(
-            url=identity_url, headers={"Authorization": f"Bearer {flask.session['access_token']}"}
+            url=identity_url,
+            headers={"Authorization": f"Bearer {flask.session['access_token']}"},
         )
         identity_response.raise_for_status()
     except Exception as error:
@@ -215,7 +224,7 @@ def oauth_callback():
 
     if identity_response.json()["blocked"]:
         app.logger.exception("User is blocked")
-        return (f"Unauthorized, your user is blocked in wikimedia.", 401)
+        return ("Unauthorized, your user is blocked in wikimedia.", 401)
 
     flask.session["username"] = identity_response.json()["username"]
     app.logger.info(f"OAuth identity confirmed: {flask.session['username']}")
@@ -250,10 +259,10 @@ def update_definition(definition_id: int):
             author=current_user.username,
         )
 
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
-    except lib.Unauthorized as error:
+    except lib.UnauthorizedError as error:
         return (f"{error}", 401)
 
     return flask.redirect(flask.url_for("get_term", term_name=term_name))
@@ -275,7 +284,7 @@ def create_term():
             content=content,
             author=current_user.username,
         )
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return flask.redirect(flask.url_for("get_term", term_name=term_name))
@@ -296,7 +305,7 @@ def create_definition():
             content=content,
             author=current_user.username,
         )
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     return flask.redirect(flask.url_for("get_term", term_name=term_name))
@@ -311,11 +320,14 @@ def delete_definition():
 
     try:
         definition = lib.get_definition(id=def_id)
-    except lib.NotFound as error:
+    except lib.NotFoundError as error:
         return (f"{error}", 404)
 
     if definition.author != current_user.username:
-        return (f"Unauthorized, you are not the user that created this definition.", 401)
+        return (
+            "Unauthorized, you are not the user that created this definition.",
+            401,
+        )
 
     lib.delete_definition(id=def_id)
     return ("Definition deleted", 200)
@@ -324,7 +336,9 @@ def delete_definition():
 @app.route("/favicon.ico")
 def favicon():
     return flask.send_from_directory(
-        os.path.join(app.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon"
+        os.path.join(app.root_path, "static"),
+        "favicon.ico",
+        mimetype="image/vnd.microsoft.icon",
     )
 
 

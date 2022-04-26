@@ -138,6 +138,10 @@ AUTHORS
 
 dev.db
 prod-config.yaml
-^app.py
-^static
-^templates
+/app.py
+/static
+/templates
+
+/lolo
+
+/.vscode/

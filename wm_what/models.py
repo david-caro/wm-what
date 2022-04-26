@@ -7,18 +7,23 @@ db = SQLAlchemy()
 ma = Marshmallow()
 
 
-class Definition(db.Model):
+class Definition(db.Model):  # type: ignore
     __tablename__ = "definition"
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(80), unique=False, nullable=False)
     content = db.Column(db.String(256), unique=False, nullable=False)
     created = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.now())
-    updated = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.now(), onupdate=db.func.now())
+    updated = db.Column(
+        db.TIMESTAMP,
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now(),
+    )
     term_name = db.Column(db.String(80), db.ForeignKey("term.name"))
     term = db.relationship("Term", back_populates="definitions")
 
 
-class Term(db.Model):
+class Term(db.Model):  # type: ignore
     __tablename__ = "term"
     name = db.Column(db.String(80), primary_key=True)
     definitions = db.relationship("Definition", back_populates="term")
@@ -33,13 +38,13 @@ class User(UserMixin):
         return self.username
 
 
-class DefinitionSchema(ma.SQLAlchemyAutoSchema):
+class DefinitionSchema(ma.SQLAlchemyAutoSchema):  # type: ignore
     class Meta:
         model = Definition
         include_fk = True
 
 
-class TermSchema(ma.SQLAlchemyAutoSchema):
+class TermSchema(ma.SQLAlchemyAutoSchema):  # type: ignore
     class Meta:
         model = Term
         include_fk = True
